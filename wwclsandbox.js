@@ -4,22 +4,6 @@
   var sys = require('sys')
   var exec = require('child_process').exec;
   
-  
-  var pcap = require("pcap"),
-    pcap_session = pcap.createSession("", "tcp")
-    matcher = /safari/i;
-
-    console.log("Listening on " + pcap_session.device_name);
-    
-    pcap_session.on('packet', function (raw_packet) {
-        var packet = pcap.decode.packet(raw_packet),
-            data = packet.link.ip.tcp.data;
-    
-        if (data && matcher.test(data.toString())) {
-            console.log(pcap.print.packet(packet));
-            console.log(data.toString());
-        }
-    });
 
   /* Get Machine External Address (Public IP) */
   external_address.lookup(function(error, address) {
@@ -36,8 +20,7 @@
       var isClient      = 0;
       
       /* Some globals */
-      var strServer     = 'https://worldwide_network_analyzer_central-c9-mastayoda1.c9.io';
-      var strTestServer = "63.245.8.242";
+      var strServer     = 'https://wwcl-server-mastayoda1.c9.io';
       
       /* Scheduling taks */
       var schedule = require('node-schedule');
