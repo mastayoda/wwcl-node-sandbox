@@ -6,8 +6,9 @@
   "repository": "",
   "author": "Mostafa Eweda <mo.eweda@gmail.com>",
   "dependencies": {
-    "async": "~0.2.8",
-    "express": "~3.2.4",
-    "socket.io": "~0.9.14"
+    "numeric": "^1.2.6",
+    "paralleljs": "^0.2.1",
+    "socket.io": "~0.9.14",
+    "xmlhttprequest": "1.6.0"
   }
 }

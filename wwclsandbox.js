@@ -1,206 +1,337 @@
-  var io = require('socket.io-client');
-  var external_address = require('external-address');
-  
-  var sys = require('sys')
-  var exec = require('child_process').exec;
-  
-
-  /* Get Machine External Address (Public IP) */
-  external_address.lookup(function(error, address) {
-
-      /* Initializing timer */
-      var timeTimer     = new Date().getTime();
-      
-      /* All pipes in Topology */
-      var pipeSockets   = [];
-      
-      
-      /* Handling ping request */
-      var ping          = require("net-ping");
-      var isClient      = 0;
-      
-      /* Some globals */
-      var strServer     = 'https://wwcl-server-mastayoda1.c9.io';
-      
-      /* Scheduling taks */
-      var schedule = require('node-schedule');
-      var rule = new schedule.RecurrenceRule();
-	    rule.minute = null;
-	    
-      /* Executing code */
-      var SandCastle = require('sandcastle').SandCastle;
-      var sandcastle = new SandCastle();
-
-      console.log("Init timer: " + timeTimer);
-
-      var sysInfo = dumpSystemInfo(address);
-
-      var socket = io.connect(strServer, {
-          query: 'isClient=' + isClient + '&' + 'sysInfo=' + JSON.stringify(sysInfo) 
-      });
-
-      var pipeArray = [];
-
-      /* Connection succeed */
-      socket.on('connect', function() {
-
-          /* Disconnect handler */
-          socket.on('disconnect', function() {
-              
-              console.log("Disconnected")
-              
-          });
-
-          /* New Pipe Connected handler */
-          socket.on('sandboxConnected', function(pipeInfo) {
-              
-              var pipe = JSON.parse(pipeInfo);
-              
-              pipeArray[pipe.id] = pipe;
-
-              console.log("New SandBox!", pipe);
-          });
-
-          /* New Pipe Disconnected handler */
-          socket.on('sandboxDisconnected', function(id) {
-
-              pipeArray.splice(pipeArray.indexOf(id), 1);
-
-              console.log("SandBox " + id + " disconnected!");
-
-          });
-
-          /* Receive pipeListing Handler */
-          socket.on('reponseSandBoxListing', function(data) {
-
-              var connectedPipes = JSON.parse(data);
-              connectedPipes.forEach(function(pipe) {
-                  pipeArray[pipe.id] = pipe;
-              });
-
-              console.log(connectedPipes.length + " sandboxes connected!");
-
-          });/*END Receive sandboxListing Handler */
-          
-          /* RTT test */
-          socket.on('sandboxRTT', function(socket) {
-
-              console.log("Sandbox RTT test" );
-             
-              function puts(error, stdout, stderr) { sys.puts(stdout) }
-              exec("ping -c 10 localhost", puts);
-
-          });/*END RTT test */
-          
-           /* Scheduler */
-          socket.on('sandboxExecuteSchedule', function(data) {
-
-              console.log("Sandbox Received Execute Schedule: " + data);
-
-          });/*END Scheduler */
-          
-          /* Initiate Sending Process and Data Collection */
-          socket.on('sandboxStartSend', function(data) {
-
-              console.log("Sandbox Start Sending Data: " + data);
-
-          });/*END Initiate Sending Process and Data Collection */
-
-          /* Deploy Topology */
-          socket.on('sandboxDeployTopology', function(data) {
-
-              console.log("Sandbox Received Deploy Topology: " + data);
-
-          });/*END Deploy Topology */
-          
-          /*Receiving Schedule Data from Server Ping-Pong */
-          socket.on('sandboxReceiveScheduleData', function(packet) {
-              var localPacket = JSON.parse(packet);
-              console.log("Sandbox Received Data Packet from Server: " + localPacket.payload);
-              
-              var Pool = require('sandcastle').Pool;
-              
-              var poolOfSandcastles = new Pool( { numberOfInstances: 1 }, { timeout: 6000 } );
-              
-              var script = poolOfSandcastles.createScript("\
-                exports.main = function() {" + localPacket.payload +  "}\
-              ");
-      
-              script.on('exit', function(err, output) {
-                console.log(output); 
-              });
-              
-              script.on('timeout', function() {
-                console.log('timed out handler');
-              });
-      
-              script.run();
-          });//END Receiving Schedule Data from Server Ping-Pong
-          
-          var j = schedule.scheduleJob(rule, function(){
-	        var localPacket = timerHandler();
-	        socket.emit("sandboxSendScheduleData", JSON.stringify(localPacket));
-	      });
-
-          /* Request Sandbox listing */
-          socket.emit("requestSandBoxListing");
-
-      });/*END Connection succeed */
+   var io = require('socket.io-client');
+   var Parallel = require("paralleljs");
+   /*Declaring Globals*/
+   var runningJobs = [];
+   var jobRunLimit = 300; /* 5 Minutes execution limit*/
+   var socket = null;
+   var seqFlops = calculateGigaFlopsSequential();
+   var parFlops = 0;
+   var RTT = "temp";
 
 
-  });/* END Get Machine External Address (Public IP) */
-  
+   function socketIOConnect() {
 
-  /* Trigger this function when timer */  
-  function timerHandler() {  
-    var packet = {};
-    packet.payload = "var x=10; exit(x);";
-  
-    console.log('Sandbox Scheduled tasks triggered.');
-    return packet;
-  }
-  
-  /* Get Object with all system Specifications */
-  function dumpSystemInfo(address) {
+       /* Extracting browser's info */
+       var sysInfo = dumpSystemInfo();
 
-    var os = require('os');
-    var specs = {};
+       /* Join World Wide Cluster */
+       socket = io.connect("https://wwcl-server-mastayoda1.c9.io", {
+           query: 'isClient=' + false + '&' + 'sysInfo=' + JSON.stringify(sysInfo)
+       });
 
-    specs.cpu = os.cpus()[0];
-    delete specs.cpu.times;
-    specs.cpu.cores = os.cpus().length;
-    specs.arch = os.arch();
-    specs.freemem = os.freemem();
-    specs.hostname = os.hostname();
-    specs.platform = os.platform();
-    specs.totalmem = os.totalmem();
-    specs.type = os.type();
-    specs.uptime = os.uptime();
-    specs.publicIP = address.replace('\n', '');
-    specs.flops = 1;
-    specs.isNodeJS = typeof exports !== 'undefined' && this.exports !== exports;
+       /* Connection succeed */
+       socket.on('connect', function() {
 
-    var ifaces = os.networkInterfaces();
-    var innterArr = [];
-    var isBehindNat = true;
+           /* Reconnect Event */
+           socket.on('reconnect', function() {
+               reconnect();
+           });
 
-    for (var dev in ifaces) {
-        ifaces[dev].forEach(function(details) {
-            if (details.family == 'IPv4') {
+           /* Disconnect handler */
+           socket.on('disconnect', function() {
 
-                /* Check if behind NAT */
-                if (specs.publicIP == details.address)
-                    isBehindNat = false;
+               disconnect();
+           });
 
-                innterArr.push({
-                    'dev': dev,
-                    'address': details.address
-                });
-            }
-        });
-    }
-    specs.isBehindNAT = isBehindNat;
-    specs.networkInterfaces = innterArr;
-    return specs;
-  }
+           /* Requesting Job Execution */
+           socket.on('jobExecutionRequest', function(job) {
 
+               jobExecutionRequest(job);
+           });
+
+           /* Receiving sandbox count re */
+           socket.on('clusterStatusResponse', function(status) {
+
+               clusterStatusResponse(status);
+
+           });
+
+           /* Receiving request for RTT */
+           socket.on('sampleRTT', function(status) {
+
+               socket.emit("sampleRTTResponse");
+
+           });
+
+           /* Requestion Cluster Status */
+           socket.emit("clusterStatusRequest");
+
+       });
+
+   }
+
+   /******************** SOCKET EVENTS ************************************/
+   function reconnect() {
+
+
+   }
+
+   function disconnect() {
+
+
+   }
+
+   function jobExecutionRequest(job) {
+
+       try {
+
+           /* Parsing the code */
+           var code = codeBuilder(job);
+
+           /* Creating sandbox and executing */
+           var p = new Parallel(code.data, {
+               maxWorkers: 8
+           });
+
+           /* If a partitioned job*/
+           if (job.jobCode.isPartitioned)
+           /* Executing single Job*/
+               p.map(code.kernel).then(execJobCallBack);
+           else
+           /* Executing Multiple threads upon mapped array Job*/
+               p.spawn(code.kernel).then(execJobCallBack);
+
+       } catch (e) {
+
+           /* Error Ocurred */
+           var error = {};
+           error.error = e.toString();
+           error.clientSocketId = job.clientSocketId;
+           sendError(error);
+       }
+   }
+
+
+   /* build kernel and data */
+   function codeBuilder(job) {
+
+       var params = eval(JSON.parse(job.jobCode.paramsAndData));
+
+       if (job.jobCode.isPartitioned)
+           var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;delete params.data;return params;}");
+       else
+           var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
+
+
+       /* If a partitioned job, split array and assign data */
+       if (job.jobCode.isPartitioned) {
+
+           var paramArr = [];
+           /* Adding first index */
+           var indexCnt = job.jobCode.pRange[0];
+           /* Building objects */
+           for (var i = 0; i < params.length; i++) {
+               var obj = {};
+               obj.data = params[i];
+               obj.index = indexCnt;
+               obj.clientSocketId = job.clientSocketId;
+               obj.jobId = job.jobId;
+
+               paramArr.push(obj);
+               indexCnt++;
+           }
+           return {
+               "kernel": func,
+               "data": paramArr
+           };
+
+       } else {
+
+           var obj = {};
+           obj.data = params;
+           obj.clientSocketId = job.clientSocketId;
+           obj.jobId = job.jobId;
+
+           return {
+               "kernel": func,
+               "data": obj
+           };
+       }
+   }
+
+   function execJobCallBack(execResults) {
+
+       /* if results from kernel function is undefined
+        * something went terrible wrong, return */
+       if (execResults == undefined) {
+           /* Error Ocurred */
+           var error = {};
+           error.error = "Kernel function returned undefined.";
+           error.clientSocketId = "NEED TO FIX THIS";
+           sendError(error);
+       }
+
+       /* If map operation, clean results */
+       if (execResults instanceof Array) {
+           var mapRes = {};
+           mapRes.clientSocketId = execResults[0].clientSocketId;
+           mapRes.jobId = execResults[0].jobId;
+           mapRes.result = [];
+
+           for (var i = 0; i < execResults.length; i++) {
+               /* Cleaning unnecesary properties */
+               delete execResults[i].clientSocketId;
+               /* Pushing data */
+               mapRes.result.push(execResults[i]);
+           }
+
+           /* reseting results */
+           execResults = mapRes;
+       } else /* Spawn instance */ {
+           delete execResults.sandboxSocketId;
+           delete execResults.data;
+       }
+
+       /* returning reesuls */
+       sendResults(execResults);
+   }
+
+   function clusterStatusResponse(status) {
+       console.log(status);
+
+   }
+
+   /*************************** HELPER FUNCTIONS **********************************/
+   /* Send Results Back when done */
+   function sendResults(results) {
+       socket.emit("jobDeploymentResponse", results);
+   }
+
+   function sendError(error) {
+       socket.emit("jobDeploymentErrorResponse", error);
+   }
+
+   /* Get Object with all system Specifications */
+   function dumpSystemInfo() {
+
+       var os = require('os');
+       var specs = {};
+
+       specs.cpu = os.cpus()[0];
+       delete specs.cpu.times;
+       specs.cpu.cores = os.cpus().length;
+       specs.arch = os.arch();
+       specs.freemem = os.freemem();
+       specs.hostname = os.hostname();
+       specs.platform = os.platform();
+       specs.totalmem = os.totalmem();
+       specs.type = os.type();
+       specs.uptime = os.uptime();
+       specs.publicIP = getClientIP();
+       specs.flops = calculateGigaFlopsSequential();
+       specs.pFlops = specs.cpu.cores * specs.flops;
+       specs.isNodeJS = true;
+
+       var ifaces = os.networkInterfaces();
+       var innterArr = [];
+       var isBehindNat = true;
+
+       for (var dev in ifaces) {
+           ifaces[dev].forEach(function(details) {
+               if (details.family == 'IPv4') {
+
+                   /* Check if behind NAT */
+                   if (specs.publicIP == details.address)
+                       isBehindNat = false;
+
+                   innterArr.push({
+                       'dev': dev,
+                       'address': details.address
+                   });
+               }
+           });
+       }
+       specs.isBehindNAT = isBehindNat;
+       specs.networkInterfaces = innterArr;
+       return specs;
+   }
+
+   function getClientIP() {
+        
+       var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+       var xmlhttp = new XMLHttpRequest();
+
+       xmlhttp.open("GET", "http://ip-api.com/json", false);
+       xmlhttp.send();
+
+       var hostipInfo = xmlhttp.responseText.split("\n");
+
+       return JSON.parse(hostipInfo[0]).query;
+   }
+
+
+   function calculateGigaFlopsSequential() {
+
+       var numeric = require("numeric");
+       var bench = numeric.bench;
+       var mkA = function(n) {
+           return numeric.random([n, n]);
+       };
+       var mkV = function(n) {
+           return numeric.random([n]);
+       };
+       var V = mkV(3000);
+       var V1 = mkV(1000);
+       var V2 = mkV(1000);
+       var absBench = bench(function() {
+           numeric.abs(V);
+       });
+       //console.log("absBench:" + absBench);
+       var identityBench = bench(function() {
+           numeric.identity(1000);
+       });
+       //console.log("identityBench:" + identityBench);
+       var A = mkA(1000);
+       var matrixTrans = bench(function() {
+           numeric.transpose(A);
+       });
+       //console.log("matrixTrans:" + matrixTrans);
+       var matrixVectorProduct = bench(function() {
+           numeric.dot(A, V1);
+       });
+       //console.log("matrixVectorProduct:" + matrixVectorProduct);
+       var vectorMatrixProduct = bench(function() {
+           numeric.dot(V1, A);
+       });
+       //console.log("vectorMatrixProduct:" + vectorMatrixProduct);
+       var linePlusSlope = bench(function() {
+           numeric.addeq(numeric.dot(A, V1), V2);
+       });
+       // console.log("linePlusSlope:" + linePlusSlope);
+       var A = mkA(100);
+       var B = mkA(100);
+       var matrixMatrixProduct = bench(function() {
+           numeric.dot(A, B);
+       });
+       //console.log("matrixMatrixProduct:" + matrixMatrixProduct);
+       var matrixMatrixSum = bench(function() {
+           numeric.add(A, A);
+       });
+       //console.log("matrixMatrixSum:" + matrixMatrixSum);
+       var matrixInverse = bench(function() {
+           numeric.inv(A);
+       });
+       //console.log("matrixInverse:" + matrixInverse);
+       var A = numeric.ccsScatter(numeric.cdelsq(numeric.cgrid(30)));
+       var sparseLaplacian = bench(function() {
+           numeric.ccsLUP(A);
+       });
+       //console.log("sparseLaplacian:" + sparseLaplacian);
+       var A = numeric.cdelsq(numeric.cgrid(30));
+       var bandedLaplacian = bench(function() {
+           numeric.cLU(A);
+       });
+       //console.log("bandedLaplacian:" + bandedLaplacian);
+       var geometricmeans = (absBench + identityBench + matrixTrans + matrixVectorProduct + vectorMatrixProduct + linePlusSlope + matrixMatrixProduct + matrixMatrixSum + matrixInverse + sparseLaplacian + bandedLaplacian) / 11000;
+
+       return Number(geometricmeans.toFixed(2));
+   }
+
+   /*****************BenchMark Functions******************************************/
+   function recordRTT(error, stdout, stderr) {
+       RTT = "TEST";
+   }
+
+
+    /* Connect */
+    socketIOConnect();
