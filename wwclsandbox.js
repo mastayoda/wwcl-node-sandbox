@@ -7,7 +7,10 @@
    var seqFlops = calculateGigaFlopsSequential();
    var parFlops = 0;
    var RTT = "temp";
-
+   
+   /* This will call the main after parallel flops are calculated */ 
+   var os = require('os');
+   calculateGigaFlopsParallel(os.cpus().length) 
 
    function socketIOConnect() {
 
@@ -218,8 +221,8 @@
        specs.type = os.type();
        specs.uptime = os.uptime();
        specs.publicIP = getClientIP();
-       specs.flops = calculateGigaFlopsSequential();
-       specs.pFlops = specs.cpu.cores * specs.flops;
+       specs.flops = seqFlops;
+       specs.pFlops = parFlops;
        specs.isNodeJS = true;
 
        var ifaces = os.networkInterfaces();
@@ -326,6 +329,27 @@
 
        return Number(geometricmeans.toFixed(2));
    }
+   
+   
+   function calculateGigaFlopsParallel(numOfcores) {
+
+
+    var p = new Parallel(new Array(numOfcores));
+    p.map(calculateGigaFlopsSequential).then(function(geometricmeans) {
+
+        var mean = 0;
+        for (var i = 0; i < geometricmeans.length; i++)
+            mean += geometricmeans[i];
+
+        /* Storing parallel flops */
+        parFlops = Number(mean.toFixed(2));
+
+        /* FOR TESTING REMOVE LATER */
+        /* Connect to the system */
+        socketIOConnect();
+    });
+
+}
 
    /*****************BenchMark Functions******************************************/
    function recordRTT(error, stdout, stderr) {
@@ -334,4 +358,4 @@
 
 
     /* Connect */
-    socketIOConnect();
+   // socketIOConnect();
