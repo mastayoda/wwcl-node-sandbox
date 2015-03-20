@@ -12,6 +12,7 @@
    var os = require('os');
    calculateGigaFlopsParallel(os.cpus().length) 
 
+
    function socketIOConnect() {
 
        /* Extracting browser's info */
