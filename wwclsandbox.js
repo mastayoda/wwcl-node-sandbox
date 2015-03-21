@@ -183,6 +183,9 @@
 
    function execJobCallBack(execResults) {
 
+       var jobId;
+       var clientId;
+
        /* if results from kernel function is undefined
         * something went terrible wrong, return */
        if (execResults == undefined) {
@@ -199,6 +202,8 @@
            mapRes.clientSocketId = execResults[0].clientSocketId;
            mapRes.jobId = execResults[0].jobId;
            mapRes.result = [];
+           jobId =  mapRes.jobId;
+           clientId = mapRes.clientSocketId;
 
            for (var i = 0; i < execResults.length; i++) {
                /* Cleaning unnecesary properties */
@@ -210,6 +215,8 @@
            /* reseting results */
            execResults = mapRes;
        } else /* Spawn instance */ {
+           jobId =  execResults.jobId;
+           clientId = execResults.clientSocketId;
            delete execResults.sandboxSocketId;
            delete execResults.data;
        }
@@ -217,7 +224,7 @@
        /* returning reesuls */
        sendResults(execResults);
 
-       console.log("[Job Finish]: Client: "+ execResults[0].jobId + " | job: " +  execResults[0].jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+       console.log("[Job Finish]: Client: "+ clientId + " | job: " +  jobId + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
    }
 
    function clusterStatusResponse(status) {
