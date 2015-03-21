@@ -1,5 +1,6 @@
    var io = require('socket.io-client');
    var Parallel = require("paralleljs");
+   var async = require("async");
    /*Declaring Globals*/
    var runningJobs = [];
    var jobRunLimit = 300; /* 5 Minutes execution limit*/
@@ -7,6 +8,24 @@
    var seqFlops = calculateGigaFlopsSequential();
    var parFlops = 0;
    var RTT = "temp";
+
+
+   /* Job Queue Object */
+   /* This is an async object that will enqueue jobs and execute 1 at the time(no job concurrency)
+    * In the near future, we can incremente the concurrency.
+    * */
+   var jobQueue = async.queue(function (task, callback) {
+
+       try{
+           jobExecutionRequest(task.job);
+           console.log("[Job Finish]: Client: "+ task.job.clientSocketId + " | job: " +  task.job.jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+       }catch(e)
+       {
+           console.log("[Job Error]: Client: "+ task.job.clientSocketId + " | job: " +  task.job.jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+       }
+
+       callback();
+   }, 1);
    
    /* This will call the main after parallel flops are calculated */ 
    var os = require('os');
@@ -40,7 +59,11 @@
            /* Requesting Job Execution */
            socket.on('jobExecutionRequest', function(job) {
 
-               jobExecutionRequest(job);
+               console.log("[Job Arrival]: Client: "+ job.clientSocketId + " | job: " +  job.jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+               /* Enqueue and execute asynchronously */
+               jobQueue.push({"job":job},function (err) {
+
+               });
            });
 
            /* Receiving sandbox count re */
@@ -72,6 +95,7 @@
 
    function disconnect() {
 
+       console.log("Disconnection] "+ new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
 
    }
 
@@ -191,8 +215,8 @@
    }
 
    function clusterStatusResponse(status) {
-       console.log(status);
 
+       console.log("[Sandbox Connected]: Clients: "+ status.ClientCount + " | Sandboxes: "+ status.SandBoxCount + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
    }
 
    /*************************** HELPER FUNCTIONS **********************************/
