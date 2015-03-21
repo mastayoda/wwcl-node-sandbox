@@ -1,6 +1,8 @@
    var io = require('socket.io-client');
    var Parallel = require("paralleljs");
    var async = require("async");
+   var moment = require('moment');
+
    /*Declaring Globals*/
    var runningJobs = [];
    var jobRunLimit = 300; /* 5 Minutes execution limit*/
@@ -10,15 +12,17 @@
    var RTT = "temp";
 
 
+   var startSetupDate = new Date();
+
    /* Job Queue Object */
    /* This is an async object that will enqueue jobs and execute 1 at the time(no job concurrency)
     * In the near future, we can incremente the concurrency.
     * */
    var jobQueue = async.queue(function (task, callback) {
 
+
        try{
            jobExecutionRequest(task.job);
-           console.log("[Job Finish]: Client: "+ task.job.clientSocketId + " | job: " +  task.job.jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
        }catch(e)
        {
            console.log("[Job Error]: Client: "+ task.job.clientSocketId + " | job: " +  task.job.jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
@@ -212,11 +216,15 @@
 
        /* returning reesuls */
        sendResults(execResults);
+
+       console.log("[Job Finish]: Client: "+ execResults[0].jobId + " | job: " +  execResults[0].jobId  + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
    }
 
    function clusterStatusResponse(status) {
 
-       console.log("[Sandbox Connected]: Clients: "+ status.ClientCount + " | Sandboxes: "+ status.SandBoxCount + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
+       var ms = moment(new Date()).diff(moment(startSetupDate));
+       var d = moment.duration(ms);
+       console.log("[Sandbox Connected]: Time: " + d.seconds() + " secs | " + " Clients: "+ status.ClientCount + " | Sandboxes: "+ status.SandBoxCount + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
    }
 
    /*************************** HELPER FUNCTIONS **********************************/
