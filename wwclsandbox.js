@@ -1,5 +1,7 @@
    var io = require('socket.io-client');
    var Parallel = require("paralleljs");
+   var sys = require('sys')
+   var exec = require('child_process').exec;
    var async = require("async");
    var moment = require('moment');
 
@@ -33,7 +35,7 @@
    
    /* This will call the main after parallel flops are calculated */ 
    var os = require('os');
-   calculateGigaFlopsParallel(os.cpus().length) 
+   calculateGigaFlopsParallel(os.cpus().length);
 
 
    function socketIOConnect() {
@@ -110,18 +112,50 @@
            /* Parsing the code */
            var code = codeBuilder(job);
 
-           /* Creating sandbox and executing */
-           var p = new Parallel(code.data, {
-               maxWorkers: 8
-           });
-
            /* If a partitioned job*/
-           if (job.jobCode.isPartitioned)
-           /* Executing single Job*/
+           if (job.jobCode.isPartitioned) {
+
+               /* Creating sandbox and executing */
+               var p = new Parallel(code.data, {
+                   maxWorkers: 8
+               });
+
+               /* Executing single Job*/
                p.map(code.kernel).then(execJobCallBack);
+           }
+           else if(job.jobCode.readFromDisk)/* Reads from disk */
+           {
+               code.childProc.stdout.on('data', function(data) {
+
+                   var stdInData = data.split("\n");
+                   stdInData = stdInData.slice(0,stdInData.length-1);
+
+                   p = new Parallel(stdInData, {
+                       maxWorkers: 8
+                   });
+                   /* Executing single Job*/
+                   execJobCallBack.origin = code.origin;
+                   p.map(code.kernel).then(execJobCallBack);
+               });
+
+               code.childProc.stderr.on('data', function(data) {
+                   console.log('stderr: ' + data);
+               });
+
+               code.childProc.on('close', function(code) {
+                   console.log('closing code: ' + code);
+               });
+           }
            else
-           /* Executing Multiple threads upon mapped array Job*/
+           {
+               /* Creating sandbox and executing */
+               var p = new Parallel(code.data, {
+                   maxWorkers: 8
+               });
+
+               /* Executing Multiple threads upon mapped array Job*/
                p.spawn(code.kernel).then(execJobCallBack);
+           }
 
        } catch (e) {
 
@@ -137,13 +171,16 @@
    /* build kernel and data */
    function codeBuilder(job) {
 
-       var params = eval(JSON.parse(job.jobCode.paramsAndData));
+       var params = JSON.parse(job.jobCode.paramsAndData);
 
        if (job.jobCode.isPartitioned)
            var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;delete params.data;return params;}");
+       else if(job.jobCode.readFromDisk)
+           var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
        else
            var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
 
+       console.log("Job after partitioning eval");
 
        /* If a partitioned job, split array and assign data */
        if (job.jobCode.isPartitioned) {
@@ -166,9 +203,21 @@
                "kernel": func,
                "data": paramArr
            };
+        /* This job reads from disk */
+       } else if(job.jobCode.readFromDisk)
+       {
+           var obj = {};
+           obj.clientSocketId = job.clientSocketId;
+           obj.jobId = job.jobId;
 
-       } else {
-
+           return {
+               "kernel": func,
+               "origin": obj,
+               "childProc": readFromDisk(job.jobCode.from,job.jobCode.to,job.jobCode.file) /* Reading From Disk */
+            };
+       }
+       else
+       {
            var obj = {};
            obj.data = params;
            obj.clientSocketId = job.clientSocketId;
@@ -179,6 +228,11 @@
                "data": obj
            };
        }
+   }
+
+   function readFromDisk(from,to,file)
+   {
+       return exec("sed '"+from+" ,"+to+"!d' "+file);
    }
 
    function execJobCallBack(execResults) {
@@ -196,8 +250,26 @@
            sendError(error);
        }
 
+       /* If using a file */
+       if(arguments.callee.origin)
+       {
+           var mapRes = {};
+           mapRes.clientSocketId = arguments.callee.origin.clientSocketId;
+           mapRes.jobId = arguments.callee.origin.jobId;
+           mapRes.result = [];
+           jobId =  mapRes.jobId;
+           clientId = mapRes.clientSocketId;
+
+           for (var i = 0; i < execResults.length; i++) {
+               /* Pushing data */
+               mapRes.result.push(execResults[i]);
+           }
+
+           /* reseting results */
+           execResults = mapRes;
+       }
        /* If map operation, clean results */
-       if (execResults instanceof Array) {
+       else if (execResults instanceof Array) {
            var mapRes = {};
            mapRes.clientSocketId = execResults[0].clientSocketId;
            mapRes.jobId = execResults[0].jobId;
@@ -224,6 +296,7 @@
        /* returning reesuls */
        sendResults(execResults);
 
+       /* Job Finish Message */
        console.log("[Job Finish]: Client: "+ clientId + " | job: " +  jobId + " | " + new Date().toLocaleString("en-US", {timeZone: "America/New_York"}));
    }
 
@@ -398,4 +471,4 @@
 
 
     /* Connect */
-   // socketIOConnect();
+    //socketIOConnect();
