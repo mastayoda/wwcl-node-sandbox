@@ -180,8 +180,6 @@
        else
            var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
 
-       console.log("Job after partitioning eval");
-
        /* If a partitioned job, split array and assign data */
        if (job.jobCode.isPartitioned) {
 
