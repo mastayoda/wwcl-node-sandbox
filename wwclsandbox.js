@@ -1,7 +1,7 @@
    var io = require('socket.io-client');
    var Parallel = require("paralleljs");
    var sys = require('sys')
-   var exec = require('child_process').exec;
+   var exec = require('child_process').spawn;
    var async = require("async");
    var moment = require('moment');
 
@@ -266,7 +266,7 @@
    {
        console.log("Reading " + (to - from) + " lines from " + file);
        console.log("sed -n "+from+","+to+"p " + file);
-       return exec("sed -n "+from+","+to+"p " + file);
+       return spawn("sed -n "+from+","+to+"p " + file);
    }
 
    function execJobCallBack(execResults) {
