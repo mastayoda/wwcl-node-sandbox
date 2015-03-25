@@ -268,8 +268,8 @@
    function readFromDisk(from,to,file)
    {
        console.log("Reading " + (to - from) + " lines from " + file);
-       console.log("sed '"+from+" ,"+to+"!d' "+file);
-       return exec("sed '"+from+" ,"+to+"!d' "+file);
+       console.log("sed -n "+from+","+to+"p " + file);
+       return exec("sed -n "+from+","+to+"p " + file);
    }
 
    function execJobCallBack(execResults) {
