@@ -127,7 +127,7 @@
            else if(job.jobCode.readFromDisk)/* Reads from disk */
            {
                /* Global variable for input */
-               job.sdtInFinalData = [];
+               code.sdtInFinalData = [];
 
                code.childProc.stdout.on('data', function(data) {
 
@@ -135,10 +135,7 @@
                    stdInData = stdInData.slice(0,stdInData.length-1);
                    console.log("Stdin " + stdInData.length + " lines.");
 
-                   if(job.sdtInFinalData.length==0)
-                        job.sdtInFinalData = stdInData;
-                   else
-                       job.sdtInFinalData.concat(stdInData);
+                   code.sdtInFinalData = code.sdtInFinalData.concat(stdInData);
 
                    //p = new Parallel(stdInData);
                    ///* Executing single Job*/
@@ -158,16 +155,16 @@
                code.childProc.on('close', function(exitCode) {
 
                    console.log("Read Finish with code: " + exitCode);
-                   console.log("Total lines read: " + job.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from));
-                   //execJobCallBack.origin = code.origin;
-                   //
-                   //async.map(job.sdtInFinalData, code.kernel, function(err, results){
-                   //
-                   //    if(job.jobCode.hasReduce)
-                   //        results = results.reduce(code.reduce, {});
-                   //
-                   //    execJobCallBack(results);
-                   //});
+                   console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from));
+                   execJobCallBack.origin = code.origin;
+
+                   async.map(code.sdtInFinalData, code.kernel, function(err, results){
+
+                       if(job.jobCode.hasReduce)
+                           results = results.reduce(code.reduce, {});
+
+                       execJobCallBack(results);
+                   });
 
                });
            }
