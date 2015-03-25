@@ -133,6 +133,7 @@
 
                    var stdInData = data.split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
+                   console.log("Stdin " + stdInData.length + " lines.");
 
                    if(job.sdtInFinalData.length==0)
                         job.sdtInFinalData = stdInData;
@@ -156,7 +157,7 @@
 
                code.childProc.on('close', function(exitCode) {
 
-                   console.log("Total lines read: " + job.sdtInFinalData.length);
+                   console.log("Total lines read: " + job.sdtInFinalData.length + " of " +  job.jobCode.to - job.jobCode.from);
                    execJobCallBack.origin = code.origin;
 
                    async.map(job.sdtInFinalData, code.kernel, function(err, results){
