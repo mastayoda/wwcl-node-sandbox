@@ -266,7 +266,7 @@
    {
        console.log("Reading " + (to - from) + " lines from " + file);
        console.log("sed "+from+","+to+"!d " + file);
-       return spawn("sed", [from+" ,"+to+"!d",file]);
+       return spawn("sed", [from+" ,"+to+"!d",file], { stdio: 'inherit' });
    }
 
    function execJobCallBack(execResults) {
