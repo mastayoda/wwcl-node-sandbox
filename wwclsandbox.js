@@ -135,9 +135,24 @@
                    terminal  : false
                });
 
-               readInterface.on('line', function(line) {
+               code.readInterface.on('line', function(line) {
 
                    code.sdtInFinalData.push(line);
+
+               });
+
+               code.readInterface.on('close', function(data) {
+
+                   console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
+                   execJobCallBack.origin = code.origin;
+
+                   async.map(code.sdtInFinalData, code.kernel, function(err, results){
+
+                       if(job.jobCode.hasReduce)
+                           results = results.reduce(code.reduce, {});
+
+                       execJobCallBack(results);
+                   });
 
                });
 
@@ -159,21 +174,6 @@
                //    //    p.map(code.kernel).then(execJobCallBack);
                //});
 
-               code.readInterface.on('close', function(data) {
-
-                   console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
-                   execJobCallBack.origin = code.origin;
-
-                   async.map(code.sdtInFinalData, code.kernel, function(err, results){
-
-                       if(job.jobCode.hasReduce)
-                           results = results.reduce(code.reduce, {});
-
-                       execJobCallBack(results);
-                   });
-
-               });
-
                //code.childProc.stdout.on('end', function(data) {
                //
                //    console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
@@ -189,11 +189,11 @@
                //
                //});
 
-               code.childProc.stderr.on('exit', function(code) {
-                   if (code != 0) {
-                       console.log('Failed While reading file: ' + code);
-                   }
-               });
+               //code.childProc.stderr.on('exit', function(code) {
+               //    if (code != 0) {
+               //        console.log('Failed While reading file: ' + code);
+               //    }
+               //});
            }
            else
            {
