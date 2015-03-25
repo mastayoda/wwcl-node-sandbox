@@ -121,7 +121,10 @@
                });
 
                /* Executing single Job*/
-               p.map(code.kernel).then(execJobCallBack);
+               if (job.jobCode.hasReduce)
+                    p.map(code.kernel).reduce(code.reduce).then(execJobCallBack);
+               else
+                    p.map(code.kernel).then(execJobCallBack);
            }
            else if(job.jobCode.readFromDisk)/* Reads from disk */
            {
@@ -135,7 +138,12 @@
                    });
                    /* Executing single Job*/
                    execJobCallBack.origin = code.origin;
-                   p.map(code.kernel).then(execJobCallBack);
+
+                   /* Executing single Job*/
+                   if (job.jobCode.hasReduce)
+                       p.map(code.kernel).reduce(code.reduce).then(execJobCallBack);
+                   else
+                       p.map(code.kernel).then(execJobCallBack);
                });
 
                code.childProc.stderr.on('data', function(data) {
@@ -171,14 +179,20 @@
    /* build kernel and data */
    function codeBuilder(job) {
 
+       var func, reduce = {};
        var params = JSON.parse(job.jobCode.paramsAndData);
 
+       /* Parsing Kernel */
        if (job.jobCode.isPartitioned)
-           var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;delete params.data;return params;}");
+           func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;delete params.data;return params;}");
        else if(job.jobCode.readFromDisk)
-           var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
+           func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
        else
-           var func = eval("a=function(params){result='result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
+           func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
+
+       /* Parsing Reduce */
+       if (job.jobCode.hasReduce)
+            reduce = eval("a=function(params){result='Reduce result variable not set!';try{" + job.jobCode.reduceCode + "}catch(ex){result=ex.toString();}return result;}");
 
        /* If a partitioned job, split array and assign data */
        if (job.jobCode.isPartitioned) {
@@ -193,12 +207,14 @@
                obj.index = indexCnt;
                obj.clientSocketId = job.clientSocketId;
                obj.jobId = job.jobId;
+               obj.hasReduce = job.jobCode.hasReduce;
 
                paramArr.push(obj);
                indexCnt++;
            }
            return {
                "kernel": func,
+               "reduce": reduce,
                "data": paramArr
            };
         /* This job reads from disk */
@@ -207,9 +223,11 @@
            var obj = {};
            obj.clientSocketId = job.clientSocketId;
            obj.jobId = job.jobId;
+           obj.hasReduce = job.jobCode.hasReduce;
 
            return {
                "kernel": func,
+               "reduce": reduce,
                "origin": obj,
                "childProc": readFromDisk(job.jobCode.from,job.jobCode.to,job.jobCode.file) /* Reading From Disk */
             };
@@ -220,9 +238,11 @@
            obj.data = params;
            obj.clientSocketId = job.clientSocketId;
            obj.jobId = job.jobId;
+           obj.hasReduce = job.jobCode.hasReduce;
 
            return {
                "kernel": func,
+               "reduce": reduce,
                "data": obj
            };
        }
@@ -251,6 +271,7 @@
        /* If using a file */
        if(arguments.callee.origin)
        {
+
            var mapRes = {};
            mapRes.clientSocketId = arguments.callee.origin.clientSocketId;
            mapRes.jobId = arguments.callee.origin.jobId;
@@ -258,9 +279,16 @@
            jobId =  mapRes.jobId;
            clientId = mapRes.clientSocketId;
 
-           for (var i = 0; i < execResults.length; i++) {
-               /* Pushing data */
-               mapRes.result.push(execResults[i]);
+           /* Check if has reduce */
+           if(arguments.callee.origin.hasReduce)
+           {
+               mapRes.result =   execResults;
+           }
+           else {
+               for (var i = 0; i < execResults.length; i++) {
+                   /* Pushing data */
+                   mapRes.result.push(execResults[i]);
+               }
            }
 
            /* reseting results */
