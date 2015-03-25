@@ -116,9 +116,7 @@
            if (job.jobCode.isPartitioned) {
 
                /* Creating sandbox and executing */
-               var p = new Parallel(code.data, {
-                   maxWorkers: 8
-               });
+               var p = new Parallel(code.data);
 
                /* Executing single Job*/
                if (job.jobCode.hasReduce)
@@ -133,9 +131,7 @@
                    var stdInData = data.split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
 
-                   p = new Parallel(stdInData, {
-                       maxWorkers: 8
-                   });
+                   p = new Parallel(stdInData);
                    /* Executing single Job*/
                    execJobCallBack.origin = code.origin;
 
@@ -157,9 +153,7 @@
            else
            {
                /* Creating sandbox and executing */
-               var p = new Parallel(code.data, {
-                   maxWorkers: 8
-               });
+               var p = new Parallel(code.data);
 
                /* Executing Multiple threads upon mapped array Job*/
                p.spawn(code.kernel).then(execJobCallBack);
