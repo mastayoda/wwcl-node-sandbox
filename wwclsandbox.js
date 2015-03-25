@@ -271,7 +271,7 @@
        /* If using a file */
        if(arguments.callee.origin)
        {
-
+           console.log("Returning batch ");
            var mapRes = {};
            mapRes.clientSocketId = arguments.callee.origin.clientSocketId;
            mapRes.jobId = arguments.callee.origin.jobId;
