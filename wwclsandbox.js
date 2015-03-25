@@ -159,15 +159,15 @@
 
                    console.log("Read Finish with code: " + exitCode);
                    console.log("Total lines read: " + job.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from));
-                   execJobCallBack.origin = code.origin;
-
-                   async.map(job.sdtInFinalData, code.kernel, function(err, results){
-
-                       if(job.jobCode.hasReduce)
-                           results = results.reduce(code.reduce, {});
-
-                       execJobCallBack(results);
-                   });
+                   //execJobCallBack.origin = code.origin;
+                   //
+                   //async.map(job.sdtInFinalData, code.kernel, function(err, results){
+                   //
+                   //    if(job.jobCode.hasReduce)
+                   //        results = results.reduce(code.reduce, {});
+                   //
+                   //    execJobCallBack(results);
+                   //});
 
                });
            }
