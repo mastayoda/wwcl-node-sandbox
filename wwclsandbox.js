@@ -263,7 +263,6 @@
        } else if(job.jobCode.readFromDisk)
        {
 
-           console.log("Returning Batch");
            var obj = {};
            obj.clientSocketId = job.clientSocketId;
            obj.jobId = job.jobId;
@@ -317,6 +316,8 @@
        /* If using a file */
        if(arguments.callee.origin)
        {
+
+           console.log("Returning Batch");
 
            var mapRes = {};
            mapRes.clientSocketId = arguments.callee.origin.clientSocketId;
