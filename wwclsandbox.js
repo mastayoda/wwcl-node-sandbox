@@ -2,6 +2,7 @@
    var Parallel = require("paralleljs");
    var sys = require('sys')
    var spawn = require('child_process').spawn;
+   var readline  = require('readline');
    var async = require("async");
    var moment = require('moment');
 
@@ -129,23 +130,35 @@
                /* Global variable for input */
                code.sdtInFinalData = [];
 
-               code.childProc.stdout.on('data', function(data) {
+               readline.createInterface({
+                   input     : code.childProc.stdout,
+                   terminal  : false
+               }).on('line', function(data) {
 
                    var stdInData = data.toString().split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
 
                    code.sdtInFinalData = code.sdtInFinalData.concat(stdInData);
 
-                   //p = new Parallel(stdInData);
-                   ///* Executing single Job*/
-                   //execJobCallBack.origin = code.origin;
-                   //
-                   ///* Executing single Job*/
-                   //if (job.jobCode.hasReduce)
-                   //    p.map(code.kernel).reduce(code.reduce).then(execJobCallBack);
-                   //else
-                   //    p.map(code.kernel).then(execJobCallBack);
                });
+
+               //code.childProc.stdout.on('data', function(data) {
+               //
+               //    var stdInData = data.toString().split("\n");
+               //    stdInData = stdInData.slice(0,stdInData.length-1);
+               //
+               //    code.sdtInFinalData = code.sdtInFinalData.concat(stdInData);
+               //
+               //    //p = new Parallel(stdInData);
+               //    ///* Executing single Job*/
+               //    //execJobCallBack.origin = code.origin;
+               //    //
+               //    ///* Executing single Job*/
+               //    //if (job.jobCode.hasReduce)
+               //    //    p.map(code.kernel).reduce(code.reduce).then(execJobCallBack);
+               //    //else
+               //    //    p.map(code.kernel).then(execJobCallBack);
+               //});
 
                code.childProc.stdout.on('end', function(data) {
 
