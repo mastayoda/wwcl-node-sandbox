@@ -156,7 +156,7 @@
 
                code.childProc.on('close', function(exitCode) {
 
-
+                   console.log("Total lines read: " + job.sdtInFinalData.length);
                    execJobCallBack.origin = code.origin;
 
                    async.map(job.sdtInFinalData, code.kernel, function(err, results){
@@ -286,7 +286,7 @@
        /* If using a file */
        if(arguments.callee.origin)
        {
-           console.log("Returning batch ");
+
            var mapRes = {};
            mapRes.clientSocketId = arguments.callee.origin.clientSocketId;
            mapRes.jobId = arguments.callee.origin.jobId;
