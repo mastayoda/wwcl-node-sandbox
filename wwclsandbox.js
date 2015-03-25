@@ -1,7 +1,7 @@
    var io = require('socket.io-client');
    var Parallel = require("paralleljs");
    var sys = require('sys')
-   var exec = require('child_process').spawn;
+   var spawn = require('child_process').spawn;
    var async = require("async");
    var moment = require('moment');
 
@@ -131,7 +131,7 @@
 
                code.childProc.stdout.on('data', function(data) {
 
-                   var stdInData = data.split("\n");
+                   var stdInData = data.toString().split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
                    console.log("Stdin " + stdInData.length + " lines.");
 
@@ -148,13 +148,8 @@
                    //    p.map(code.kernel).then(execJobCallBack);
                });
 
-               code.childProc.stderr.on('data', function(data) {
-                   console.log('stderr: ' + data);
-               });
+               code.childProc.stdout.on('end', function(data) {
 
-               code.childProc.on('close', function(exitCode) {
-
-                   console.log("Read Finish with code: " + exitCode);
                    console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from));
                    execJobCallBack.origin = code.origin;
 
@@ -166,6 +161,12 @@
                        execJobCallBack(results);
                    });
 
+               });
+
+               code.childProc.stderr.on('exit', function(code) {
+                   if (code != 0) {
+                       console.log('Failed While reading file: ' + code);
+                   }
                });
            }
            else
@@ -265,8 +266,8 @@
    function readFromDisk(from,to,file)
    {
        console.log("Reading " + (to - from) + " lines from " + file);
-       console.log("sed -n "+from+","+to+"p " + file);
-       return spawn("sed -n "+from+","+to+"p " + file);
+       console.log("sed "+from+","+to+"!d " + file);
+       return spawn("sed", [from+" ,"+to+"!d",file]);
    }
 
    function execJobCallBack(execResults) {
