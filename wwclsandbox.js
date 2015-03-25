@@ -131,15 +131,28 @@
                    var stdInData = data.split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
 
-                   p = new Parallel(stdInData);
-                   /* Executing single Job*/
                    execJobCallBack.origin = code.origin;
 
-                   /* Executing single Job*/
-                   if (job.jobCode.hasReduce)
-                       p.map(code.kernel).reduce(code.reduce).then(execJobCallBack);
-                   else
-                       p.map(code.kernel).then(execJobCallBack);
+                   async.map(stdInData, code.kernel, function(err, results){
+
+                       if(job.jobCode.hasReduce)
+                         results = results.reduce(code.reduce, {});
+
+
+
+                       execJobCallBack(results);
+                   });
+
+
+                   //p = new Parallel(stdInData);
+                   ///* Executing single Job*/
+                   //execJobCallBack.origin = code.origin;
+                   //
+                   ///* Executing single Job*/
+                   //if (job.jobCode.hasReduce)
+                   //    p.map(code.kernel).reduce(code.reduce).then(execJobCallBack);
+                   //else
+                   //    p.map(code.kernel).then(execJobCallBack);
                });
 
                code.childProc.stderr.on('data', function(data) {
@@ -180,13 +193,15 @@
        if (job.jobCode.isPartitioned)
            func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;delete params.data;return params;}");
        else if(job.jobCode.readFromDisk)
-           func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
+           func = eval("a=function(params,callback){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();} callback(null, result);}");
+           //func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
        else
            func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
 
        /* Parsing Reduce */
        if (job.jobCode.hasReduce)
-            reduce = eval("a=function(params){result='Reduce result variable not set!';try{" + job.jobCode.reduceCode + "}catch(ex){result=ex.toString();}return result;}");
+           reduce = eval("a=function(last, now){var result='Reduce result variable not set!';try{" + job.jobCode.reduceCode + "}catch(ex){result=ex.toString();}return result;}");
+            //reduce = eval("a=function(params){result='Reduce result variable not set!';try{" + job.jobCode.reduceCode + "}catch(ex){result=ex.toString();}return result;}");
 
        /* If a partitioned job, split array and assign data */
        if (job.jobCode.isPartitioned) {
