@@ -130,10 +130,12 @@
                /* Global variable for input */
                code.sdtInFinalData = [];
 
-               readline.createInterface({
+               var readInterface = readline.createInterface({
                    input     : code.childProc.stdout,
                    terminal  : false
-               }).on('line', function(line) {
+               });
+
+               readInterface.on('line', function(line) {
 
                    code.sdtInFinalData.push(line);
 
@@ -157,7 +159,7 @@
                //    //    p.map(code.kernel).then(execJobCallBack);
                //});
 
-               code.childProc.stdout.on('end', function(data) {
+               readInterface.on('close', function(data) {
 
                    console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
                    execJobCallBack.origin = code.origin;
@@ -171,6 +173,21 @@
                    });
 
                });
+
+               //code.childProc.stdout.on('end', function(data) {
+               //
+               //    console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
+               //    execJobCallBack.origin = code.origin;
+               //
+               //    async.map(code.sdtInFinalData, code.kernel, function(err, results){
+               //
+               //        if(job.jobCode.hasReduce)
+               //            results = results.reduce(code.reduce, {});
+               //
+               //        execJobCallBack(results);
+               //    });
+               //
+               //});
 
                code.childProc.stderr.on('exit', function(code) {
                    if (code != 0) {
@@ -221,6 +238,7 @@
        /* If a partitioned job, split array and assign data */
        if (job.jobCode.isPartitioned) {
 
+           console.log("Returning Batch");
            var paramArr = [];
            /* Adding first index */
            var indexCnt = job.jobCode.pRange[0];
