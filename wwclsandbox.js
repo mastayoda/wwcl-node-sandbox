@@ -238,7 +238,7 @@
        /* If a partitioned job, split array and assign data */
        if (job.jobCode.isPartitioned) {
 
-           console.log("Returning Batch");
+
            var paramArr = [];
            /* Adding first index */
            var indexCnt = job.jobCode.pRange[0];
@@ -262,6 +262,8 @@
         /* This job reads from disk */
        } else if(job.jobCode.readFromDisk)
        {
+
+           console.log("Returning Batch");
            var obj = {};
            obj.clientSocketId = job.clientSocketId;
            obj.jobId = job.jobId;
