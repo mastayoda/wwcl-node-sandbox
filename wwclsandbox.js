@@ -157,7 +157,7 @@
 
                code.childProc.on('close', function(exitCode) {
 
-                   console.log("Total lines read: " + job.sdtInFinalData.length + " of " +  job.jobCode.to - job.jobCode.from);
+                   console.log("Total lines read: " + job.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from));
                    execJobCallBack.origin = code.origin;
 
                    async.map(job.sdtInFinalData, code.kernel, function(err, results){
@@ -266,6 +266,7 @@
 
    function readFromDisk(from,to,file)
    {
+       console.log("Reading " + (to - from) + " lines from " + file);
        return exec("sed '"+from+" ,"+to+"!d' "+file);
    }
 
