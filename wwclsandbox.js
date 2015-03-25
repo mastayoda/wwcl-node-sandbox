@@ -131,6 +131,8 @@
                    var stdInData = data.split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
 
+                   console.log("stdin burst!");
+
                    execJobCallBack.origin = code.origin;
 
                    async.map(stdInData, code.kernel, function(err, results){
