@@ -130,7 +130,7 @@
                /* Global variable for input */
                code.sdtInFinalData = [];
 
-               var readInterface = readline.createInterface({
+               code.readInterface = readline.createInterface({
                    input     : code.childProc.stdout,
                    terminal  : false
                });
@@ -159,7 +159,7 @@
                //    //    p.map(code.kernel).then(execJobCallBack);
                //});
 
-               readInterface.on('close', function(data) {
+               code.readInterface.on('close', function(data) {
 
                    console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
                    execJobCallBack.origin = code.origin;
