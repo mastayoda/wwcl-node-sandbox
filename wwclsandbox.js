@@ -133,12 +133,9 @@
                readline.createInterface({
                    input     : code.childProc.stdout,
                    terminal  : false
-               }).on('line', function(data) {
+               }).on('line', function(line) {
 
-                   var stdInData = data.toString().split("\n");
-                   stdInData = stdInData.slice(0,stdInData.length-1);
-
-                   code.sdtInFinalData = code.sdtInFinalData.concat(stdInData);
+                   code.sdtInFinalData.push(line);
 
                });
 
