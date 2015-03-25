@@ -126,25 +126,18 @@
            }
            else if(job.jobCode.readFromDisk)/* Reads from disk */
            {
+               /* Global variable for input */
+               job.sdtInFinalData = [];
+
                code.childProc.stdout.on('data', function(data) {
 
                    var stdInData = data.split("\n");
                    stdInData = stdInData.slice(0,stdInData.length-1);
 
-                   console.log("stdin burst!");
-
-                   execJobCallBack.origin = code.origin;
-
-                   async.map(stdInData, code.kernel, function(err, results){
-
-                       if(job.jobCode.hasReduce)
-                         results = results.reduce(code.reduce, {});
-
-
-
-                       execJobCallBack(results);
-                   });
-
+                   if(job.sdtInFinalData.length==0)
+                        job.sdtInFinalData = stdInData;
+                   else
+                       job.sdtInFinalData.concat(stdInData);
 
                    //p = new Parallel(stdInData);
                    ///* Executing single Job*/
@@ -161,8 +154,19 @@
                    console.log('stderr: ' + data);
                });
 
-               code.childProc.on('close', function(code) {
-                   console.log('closing code: ' + code);
+               code.childProc.on('close', function(exitCode) {
+
+
+                   execJobCallBack.origin = code.origin;
+
+                   async.map(job.sdtInFinalData, code.kernel, function(err, results){
+
+                       if(job.jobCode.hasReduce)
+                           results = results.reduce(code.reduce, {});
+
+                       execJobCallBack(results);
+                   });
+
                });
            }
            else
