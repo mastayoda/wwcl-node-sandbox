@@ -144,7 +144,7 @@
 
                        code.lines--;
                        code.sdtInFinalData.push(result);
-
+                       console.log(code.lines + "lines remaining");
                        if(code.lines == 0)
                        {
                            console.log("Finishing with lines mapping.");
