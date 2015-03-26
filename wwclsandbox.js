@@ -130,6 +130,8 @@
                /* Global variable for input */
                code.sdtInFinalData = [];
 
+               code.lineQueue = async.queue(code.kernel , 8);
+
                code.readInterface = readline.createInterface({
                    input     : code.childProc.stdout,
                    terminal  : false
@@ -137,24 +139,40 @@
 
                code.readInterface.on('line', function(line) {
 
-                   code.sdtInFinalData.push(line);
 
-               });
+                   code.lineQueue.push(line, function (err, result) {
 
-               code.readInterface.on('close', function(data) {
+                       code.lines--;
+                       code.sdtInFinalData.push(result);
 
-                   console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
-                   execJobCallBack.origin = code.origin;
+                       if(code.lines == 0)
+                       {
+                           console.log("Finishing with lines mapping.");
+                           if(job.jobCode.hasReduce)
+                               code.sdtInFinalData = code.sdtInFinalData.reduce(code.reduce, {});
 
-                   async.map(code.sdtInFinalData, code.kernel, function(err, results){
 
-                       if(job.jobCode.hasReduce)
-                           results = results.reduce(code.reduce, {});
-
-                       execJobCallBack(results);
+                           execJobCallBack.origin = code.origin;
+                           execJobCallBack(code.sdtInFinalData);
+                       }
                    });
-
+                   //code.sdtInFinalData.push(line);
                });
+
+               //code.readInterface.on('close', function(data) {
+               //
+               //    console.log("Total lines read: " + code.sdtInFinalData.length + " of " +  (job.jobCode.to - job.jobCode.from + 1));
+               //    execJobCallBack.origin = code.origin;
+               //
+               //    async.map(code.sdtInFinalData, code.kernel, function(err, results){
+               //
+               //        if(job.jobCode.hasReduce)
+               //            results = results.reduce(code.reduce, {});
+               //
+               //        execJobCallBack(results);
+               //    });
+               //
+               //});
 
                //code.childProc.stdout.on('data', function(data) {
                //
@@ -272,6 +290,7 @@
                "kernel": func,
                "reduce": reduce,
                "origin": obj,
+               "lines": (job.jobCode.to - job.jobCode.from + 1),
                "childProc": readFromDisk(job.jobCode.from,job.jobCode.to,job.jobCode.file) /* Reading From Disk */
             };
        }
