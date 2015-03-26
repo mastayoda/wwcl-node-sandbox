@@ -147,6 +147,8 @@
                        code.lines--;
                        code.sdtInFinalData.push(result);
 
+                       console.log("line " + code.lines + " of " + (job.jobCode.to - job.jobCode.from + 1));
+                       
                        var percent = parseInt((code.lines/(job.jobCode.to - job.jobCode.from + 1)) * 100);
                        
                        if(percent != code.prevPercent)
