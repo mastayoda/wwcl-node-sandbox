@@ -338,6 +338,8 @@
                }
            }
 
+           /* Releasing Memory */
+           arguments.callee.origin = null;
            /* reseting results */
            execResults = mapRes;
        }
