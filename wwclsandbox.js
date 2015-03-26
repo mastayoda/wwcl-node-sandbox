@@ -130,7 +130,7 @@
                /* Global variable for input */
                code.sdtInFinalData = [];
 
-               code.lineQueue = async.queue(code.kernel , 1000);
+               code.lineQueue = async.queue(code.kernel , 1);
 
                code.readInterface = readline.createInterface({
                    input     : code.childProc.stdout,
@@ -144,7 +144,7 @@
 
                        code.lines--;
                        code.sdtInFinalData.push(result);
-                       console.log(code.lines + "lines remaining");
+                       //console.log(code.lines + "lines remaining");
                        if(code.lines == 0)
                        {
                            console.log("Finishing with lines mapping.");
