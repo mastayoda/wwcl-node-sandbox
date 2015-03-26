@@ -130,7 +130,7 @@
                /* Global variable for input */
                code.sdtInFinalData = [];
 
-               code.lineQueue = async.queue(code.kernel , 8);
+               code.lineQueue = async.queue(code.kernel , 1000);
 
                code.readInterface = readline.createInterface({
                    input     : code.childProc.stdout,
