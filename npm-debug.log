@@ -1,0 +1,131 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/usr/local/bin/node',
+1 verbose cli   '/usr/local/bin/npm',
+1 verbose cli   'install',
+1 verbose cli   'async@>0.9.0' ]
+2 info using npm@1.4.28
+3 info using node@v0.10.33
+4 warn package.json chat-example@0.0.0 No repository field.
+5 verbose readDependencies using package.json deps
+6 verbose cache add [ 'async@>0.9.0', null ]
+7 verbose cache add name=undefined spec="async@>0.9.0" args=["async@>0.9.0",null]
+8 verbose parsed url { protocol: null,
+8 verbose parsed url   slashes: null,
+8 verbose parsed url   auth: null,
+8 verbose parsed url   host: null,
+8 verbose parsed url   port: null,
+8 verbose parsed url   hostname: null,
+8 verbose parsed url   hash: null,
+8 verbose parsed url   search: null,
+8 verbose parsed url   query: null,
+8 verbose parsed url   pathname: 'async@%3E0.9.0',
+8 verbose parsed url   path: 'async@%3E0.9.0',
+8 verbose parsed url   href: 'async@%3E0.9.0' }
+9 verbose cache add name="async" spec=">0.9.0" args=["async",">0.9.0"]
+10 verbose parsed url { protocol: null,
+10 verbose parsed url   slashes: null,
+10 verbose parsed url   auth: null,
+10 verbose parsed url   host: null,
+10 verbose parsed url   port: null,
+10 verbose parsed url   hostname: null,
+10 verbose parsed url   hash: null,
+10 verbose parsed url   search: null,
+10 verbose parsed url   query: null,
+10 verbose parsed url   pathname: '%3E0.9.0',
+10 verbose parsed url   path: '%3E0.9.0',
+10 verbose parsed url   href: '%3E0.9.0' }
+11 verbose addNamed [ 'async', '>0.9.0' ]
+12 verbose addNamed [ null, '>0.9.0' ]
+13 silly lockFile 8fd6a772-async-0-9-0 async@>0.9.0
+14 verbose lock async@>0.9.0 /Users/victor/.npm/8fd6a772-async-0-9-0.lock
+15 silly addNameRange { name: 'async', range: '>0.9.0', hasData: false }
+16 verbose request where is /async
+17 verbose request registry https://registry.npmjs.org/
+18 verbose request id f84b12345706781a
+19 verbose url raw /async
+20 verbose url resolving [ 'https://registry.npmjs.org/', './async' ]
+21 verbose url resolved https://registry.npmjs.org/async
+22 verbose request where is https://registry.npmjs.org/async
+23 info trying registry request attempt 1 at 01:50:07
+24 verbose etag "AV736VOYYNF3CWN7GMRT90S78"
+25 http GET https://registry.npmjs.org/async
+26 http 304 https://registry.npmjs.org/async
+27 silly registry.get cb [ 304,
+27 silly registry.get   { date: 'Thu, 26 Mar 2015 05:50:07 GMT',
+27 silly registry.get     server: 'Apache',
+27 silly registry.get     via: '1.1 varnish',
+27 silly registry.get     'last-modified': 'Thu, 26 Mar 2015 05:50:07 GMT',
+27 silly registry.get     'cache-control': 'max-age=60',
+27 silly registry.get     etag: '"AV736VOYYNF3CWN7GMRT90S78"',
+27 silly registry.get     age: '5',
+27 silly registry.get     'x-served-by': 'cache-ord1730-ORD',
+27 silly registry.get     'x-cache': 'HIT',
+27 silly registry.get     'x-cache-hits': '1',
+27 silly registry.get     'x-timer': 'S1427349007.242298,VS0,VE0',
+27 silly registry.get     vary: 'Accept',
+27 silly registry.get     'content-length': '0',
+27 silly registry.get     'keep-alive': 'timeout=10, max=50',
+27 silly registry.get     connection: 'Keep-Alive' } ]
+28 verbose etag https://registry.npmjs.org/async from cache
+29 silly addNameRange number 2 { name: 'async', range: '>0.9.0', hasData: true }
+30 silly addNameRange versions [ 'async',
+30 silly addNameRange   [ '0.1.0',
+30 silly addNameRange     '0.1.1',
+30 silly addNameRange     '0.1.2',
+30 silly addNameRange     '0.1.3',
+30 silly addNameRange     '0.1.4',
+30 silly addNameRange     '0.1.5',
+30 silly addNameRange     '0.1.6',
+30 silly addNameRange     '0.1.7',
+30 silly addNameRange     '0.1.8',
+30 silly addNameRange     '0.1.9',
+30 silly addNameRange     '0.1.10',
+30 silly addNameRange     '0.1.11',
+30 silly addNameRange     '0.1.12',
+30 silly addNameRange     '0.1.13',
+30 silly addNameRange     '0.1.14',
+30 silly addNameRange     '0.1.15',
+30 silly addNameRange     '0.1.16',
+30 silly addNameRange     '0.1.17',
+30 silly addNameRange     '0.1.18',
+30 silly addNameRange     '0.1.19',
+30 silly addNameRange     '0.1.20',
+30 silly addNameRange     '0.1.21',
+30 silly addNameRange     '0.1.22',
+30 silly addNameRange     '0.2.0',
+30 silly addNameRange     '0.2.1',
+30 silly addNameRange     '0.2.2',
+30 silly addNameRange     '0.2.3',
+30 silly addNameRange     '0.2.4',
+30 silly addNameRange     '0.2.5',
+30 silly addNameRange     '0.2.6',
+30 silly addNameRange     '0.2.7',
+30 silly addNameRange     '0.2.8',
+30 silly addNameRange     '0.2.9',
+30 silly addNameRange     '0.2.10',
+30 silly addNameRange     '0.3.0',
+30 silly addNameRange     '0.4.0',
+30 silly addNameRange     '0.4.1',
+30 silly addNameRange     '0.5.0',
+30 silly addNameRange     '0.6.0',
+30 silly addNameRange     '0.6.1',
+30 silly addNameRange     '0.6.2',
+30 silly addNameRange     '0.7.0',
+30 silly addNameRange     '0.8.0',
+30 silly addNameRange     '0.9.0' ] ]
+31 silly lockFile 8fd6a772-async-0-9-0 async@>0.9.0
+32 silly lockFile 8fd6a772-async-0-9-0 async@>0.9.0
+33 error notarget No compatible version found: async@'>0.9.0'
+33 error notarget Valid install targets:
+33 error notarget ["0.1.0","0.1.1","0.1.2","0.1.3","0.1.4","0.1.5","0.1.6","0.1.7","0.1.8","0.1.9","0.1.10","0.1.11","0.1.12","0.1.13","0.1.14","0.1.15","0.1.16","0.1.17","0.1.18","0.1.19","0.1.20","0.1.21","0.1.22","0.2.0","0.2.1","0.2.2","0.2.3","0.2.4","0.2.5","0.2.6","0.2.7","0.2.8","0.2.9","0.2.10","0.3.0","0.4.0","0.4.1","0.5.0","0.6.0","0.6.1","0.6.2","0.7.0","0.8.0","0.9.0"]
+33 error notarget
+33 error notarget This is most likely not a problem with npm itself.
+33 error notarget In most cases you or one of your dependencies are requesting
+33 error notarget a package version that doesn't exist.
+34 error System Darwin 14.0.0
+35 error command "/usr/local/bin/node" "/usr/local/bin/npm" "install" "async@>0.9.0"
+36 error cwd /Users/victor/Dropbox/Academics/COMPUTER_SCIENCE_PHD_PURDUE_UNIVERSITY/SECOND_YEAR/Spring_2015/CS6990_PhD_Tesis_(Ananth Grama)/sources/wwcl-node-sandbox
+37 error node -v v0.10.33
+38 error npm -v 1.4.28
+39 error code ETARGET
+40 verbose exit [ 1, true ]

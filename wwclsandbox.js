@@ -137,6 +137,8 @@
                    terminal  : false
                });
 
+               code.prevPercent = 0;
+
                code.readInterface.on('line', function(line) {
 
 
@@ -144,6 +146,15 @@
 
                        code.lines--;
                        code.sdtInFinalData.push(result);
+
+                       var percent = parseInt((code.lines/(job.jobCode.to - job.jobCode.from + 1)) * 100);
+                       
+                       if(percent != code.prevPercent)
+                       {
+                          console.log(percent+"%");
+                          code.prevPercent = percent;
+                       }
+
                        //console.log(code.lines + "lines remaining");
                        if(code.lines == 0)
                        {
