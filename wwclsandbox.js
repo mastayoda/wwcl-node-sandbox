@@ -128,7 +128,8 @@
            else if(job.jobCode.readFromDisk)/* Reads from disk */
            {
                /* Global variable for input */
-               code.sdtInFinalData = [];
+               code.sdtInFinalData = new Array(code.lines);
+               code.prevPercent = 100;
 
                code.lineQueue = async.queue(code.kernel , 1);
 
@@ -137,40 +138,67 @@
                    terminal  : false
                });
 
-               code.prevPercent = 100;
 
                code.readInterface.on('line', function(line) {
 
+                   var  result = code.kernel(line);
 
-                   code.lineQueue.push(line, function (err, result) {
+                   code.lines--;
+                   code.sdtInFinalData[code.lines] = result;
 
-                       code.lines--;
-                       code.sdtInFinalData.push(result);
+                   var percent = parseInt((code.lines/(job.jobCode.to - job.jobCode.from + 1)) * 100);
 
-                  
+                   if(percent < code.prevPercent)
+                   {
+                      console.log(percent+"% remaining");
+                      code.prevPercent = percent;
+                   }
 
-                       var percent = parseInt((code.lines/(job.jobCode.to - job.jobCode.from + 1)) * 100);
-                       
-                       if(percent < code.prevPercent)
-                       {
-                          console.log(percent+"% remaining");
-                          code.prevPercent = percent;
-                       }
-
-                       //console.log(code.lines + "lines remaining");
-                       if(code.lines == 0)
-                       {
-                           console.log("Finishing with lines mapping.");
-                           if(job.jobCode.hasReduce)
-                               code.sdtInFinalData = code.sdtInFinalData.reduce(code.reduce, {});
+                   //console.log(code.lines + "lines remaining");
+                   if(code.lines == 0) {
+                       console.log("Finishing with lines mapping.");
+                       if (job.jobCode.hasReduce)
+                           code.sdtInFinalData = code.sdtInFinalData.reduce(code.reduce, {});
 
 
-                           execJobCallBack.origin = code.origin;
-                           execJobCallBack(code.sdtInFinalData);
-                       }
-                   });
-                   //code.sdtInFinalData.push(line);
+                       execJobCallBack.origin = code.origin;
+                       execJobCallBack(code);
+                   }
+
                });
+
+
+
+               //code.readInterface.on('line', function(line) {
+               //
+               //
+               //    code.lineQueue.push(line, function (err, result) {
+               //
+               //        code.lines--;
+               //        code.sdtInFinalData[code.lines] = result;
+               //
+               //        var percent = parseInt((code.lines/(job.jobCode.to - job.jobCode.from + 1)) * 100);
+               //
+               //        if(percent < code.prevPercent)
+               //        {
+               //           console.log(percent+"% remaining");
+               //           code.prevPercent = percent;
+               //        }
+               //
+               //        //console.log(code.lines + "lines remaining");
+               //        if(code.lines == 0)
+               //        {
+               //            console.log("Finishing with lines mapping.");
+               //            if(job.jobCode.hasReduce)
+               //                code.sdtInFinalData = code.sdtInFinalData.reduce(code.reduce, {});
+               //
+               //
+               //            execJobCallBack.origin = code.origin;
+               //            execJobCallBack(code.sdtInFinalData);
+               //        }
+               //    });
+               //    //code.sdtInFinalData.push(line);
+               //});
 
                //code.readInterface.on('close', function(data) {
                //
@@ -256,8 +284,8 @@
        if (job.jobCode.isPartitioned)
            func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;delete params.data;return params;}");
        else if(job.jobCode.readFromDisk)
-           func = eval("a=function(params,callback){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();} callback(null, result);}");
-           //func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
+           //func = eval("a=function(params,callback){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();} callback(null, result);}");
+           func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}return result;}");
        else
            func = eval("a=function(params){result='Kernel result variable not set!';try{" + job.jobCode.kernelCode + "}catch(ex){result=ex.toString();}params.result = result;return params;}");
 
@@ -361,12 +389,12 @@
            /* Check if has reduce */
            if(arguments.callee.origin.hasReduce)
            {
-               mapRes.result =   execResults;
+               mapRes.result = execResults.sdtInFinalData;
            }
            else {
-               for (var i = 0; i < execResults.length; i++) {
+               for (var i = 0; i < execResults.sdtInFinalData.length; i++) {
                    /* Pushing data */
-                   mapRes.result.push(execResults[i]);
+                   mapRes.result.push(execResults.sdtInFinalData[i]);
                }
            }
 
