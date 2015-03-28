@@ -30,9 +30,14 @@
       <file leaf-file-name="wwclsandbox.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/wwclsandbox.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.42874694" vertical-offset="1736" max-vertical-offset="7050">
-              <caret line="139" column="1" selection-start-line="139" selection-start-column="1" selection-end-line="139" selection-end-column="1" />
+            <state vertical-scroll-proportion="0.5499398" vertical-offset="4103" max-vertical-offset="5910">
+              <caret line="379" column="27" selection-start-line="379" selection-start-column="18" selection-end-line="379" selection-end-column="27" />
               <folding>
+                <element signature="e#5043#5091#0" expanded="false" />
+                <element signature="e#6405#6454#0" expanded="false" />
+                <element signature="e#7066#7117#0" expanded="false" />
+                <element signature="e#7900#7950#0" expanded="false" />
+                <element signature="e#8562#8613#0" expanded="false" />
                 <element signature="n#!!block;n#clusterStatusResponse#0" expanded="false" />
                 <element signature="n#!!block;n#sendError#0" expanded="false" />
                 <element signature="n#!!block;n#dumpSystemInfo#0" expanded="false" />
@@ -89,6 +94,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -109,7 +115,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -117,8 +122,9 @@
     <property name="FullScreen" value="true" />
     <property name="HbShouldOpenHtmlAsHb" value="" />
     <property name="recentsLimit" value="5" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../../../EXTRAS/SUMMER 2015 Internship" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../wwcl-client" />
     <property name="restartRequiresConfirmation" value="true" />
+    <property name="editorconfig.notification" value="Applied .editorconfig settings" />
   </component>
   <component name="RunManager" selected="Node.js.wwclsandbox.js">
     <configuration default="false" name="wwclsandbox.js" type="NodeJSConfigurationType" factoryName="Node.js" temporary="true" path-to-node="/usr/local/bin/node" path-to-js-file="$PROJECT_DIR$/wwclsandbox.js" working-dir="$PROJECT_DIR$">
@@ -128,10 +134,14 @@
       <ConfigurationWrapper RunnerId="debuggableProgram" />
       <method />
     </configuration>
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
     <configuration default="true" type="DartUnitRunConfigurationType" factoryName="DartUnit">
       <method />
     </configuration>
-    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
+      <envs />
       <method />
     </configuration>
     <configuration default="true" type="JSTestDriver:ConfigurationType" factoryName="JsTestDriver">
@@ -139,10 +149,6 @@
       <setting name="settingsFile" value="" />
       <setting name="serverType" value="INTERNAL" />
       <setting name="preferredDebugBrowser" value="Chrome" />
-      <method />
-    </configuration>
-    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma" config-file="">
-      <envs />
       <method />
     </configuration>
     <configuration default="true" type="NodeJSRemoteDebug" factoryName="Node.js Remote Debug">
@@ -184,6 +190,9 @@
     </recent_temporary>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="f9b12ef2-d345-4529-9f3c-22f02a548eb0" name="Default" comment="" />
@@ -437,16 +446,21 @@
       <option name="project" value="LOCAL" />
       <updated>1427430129999</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="-Save new read file mechanism">
+      <created>1427430465175</created>
+      <option name="number" value="00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1427430465175</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1920" height="1080" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21485148" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32970297" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16633664" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15118577" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -458,11 +472,12 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32871288" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32970297" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21485148" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
     </layout>
   </component>
   <component name="Vcs.Log.UiProperties">
@@ -495,9 +510,35 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/wwclsandbox.js">
       <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7050">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#5043#5091#0" expanded="false" />
+            <element signature="e#6405#6454#0" expanded="false" />
+            <element signature="e#7066#7117#0" expanded="false" />
+            <element signature="e#7900#7950#0" expanded="false" />
+            <element signature="e#8562#8613#0" expanded="false" />
+            <element signature="n#!!block;n#clusterStatusResponse#0" expanded="false" />
+            <element signature="n#!!block;n#sendError#0" expanded="false" />
+            <element signature="n#!!block;n#dumpSystemInfo#0" expanded="false" />
+            <element signature="n#!!block;n#getClientIP#0" expanded="false" />
+            <element signature="n#!!block;n#calculateGigaFlopsSequential#0" expanded="false" />
+            <element signature="n#!!block;n#calculateGigaFlopsParallel#0" expanded="false" />
+            <element signature="n#!!block;n#recordRTT#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/wwclsandbox.js">
+      <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6600">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
+            <element signature="e#5043#5091#0" expanded="false" />
+            <element signature="e#6405#6454#0" expanded="false" />
+            <element signature="e#7066#7117#0" expanded="false" />
+            <element signature="e#7900#7950#0" expanded="false" />
+            <element signature="e#8562#8613#0" expanded="false" />
             <element signature="n#!!block;n#clusterStatusResponse#0" expanded="false" />
             <element signature="n#!!block;n#sendError#0" expanded="false" />
             <element signature="n#!!block;n#dumpSystemInfo#0" expanded="false" />
@@ -514,6 +555,11 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="5505">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
+            <element signature="e#5043#5091#0" expanded="false" />
+            <element signature="e#6405#6454#0" expanded="false" />
+            <element signature="e#7066#7117#0" expanded="false" />
+            <element signature="e#7900#7950#0" expanded="false" />
+            <element signature="e#8562#8613#0" expanded="false" />
             <element signature="n#!!block;n#clusterStatusResponse#0" expanded="false" />
             <element signature="n#!!block;n#sendError#0" expanded="false" />
             <element signature="n#!!block;n#dumpSystemInfo#0" expanded="false" />
@@ -527,9 +573,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/wwclsandbox.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.42874694" vertical-offset="1736" max-vertical-offset="7050">
-          <caret line="139" column="1" selection-start-line="139" selection-start-column="1" selection-end-line="139" selection-end-column="1" />
+        <state vertical-scroll-proportion="0.5499398" vertical-offset="4103" max-vertical-offset="5910">
+          <caret line="379" column="27" selection-start-line="379" selection-start-column="18" selection-end-line="379" selection-end-column="27" />
           <folding>
+            <element signature="e#5043#5091#0" expanded="false" />
+            <element signature="e#6405#6454#0" expanded="false" />
+            <element signature="e#7066#7117#0" expanded="false" />
+            <element signature="e#7900#7950#0" expanded="false" />
+            <element signature="e#8562#8613#0" expanded="false" />
             <element signature="n#!!block;n#clusterStatusResponse#0" expanded="false" />
             <element signature="n#!!block;n#sendError#0" expanded="false" />
             <element signature="n#!!block;n#dumpSystemInfo#0" expanded="false" />

@@ -138,7 +138,6 @@
                    terminal  : false
                });
 
-
                code.readInterface.on('line', function(line) {
 
                    var  result = code.kernel(line);
@@ -164,10 +163,7 @@
                        execJobCallBack.origin = code.origin;
                        execJobCallBack(code);
                    }
-
                });
-
-
 
                //code.readInterface.on('line', function(line) {
                //
@@ -381,9 +377,10 @@
 
            var mapRes = {};
            mapRes.clientSocketId = arguments.callee.origin.clientSocketId;
+           mapRes.sandboxId = socket.id;
+           jobId =  mapRes.jobId;
            mapRes.jobId = arguments.callee.origin.jobId;
            mapRes.result = [];
-           jobId =  mapRes.jobId;
            clientId = mapRes.clientSocketId;
 
            /* Check if has reduce */
@@ -408,6 +405,7 @@
            var mapRes = {};
            mapRes.clientSocketId = execResults[0].clientSocketId;
            mapRes.jobId = execResults[0].jobId;
+           mapRes.sandboxId = socket.id;
            mapRes.result = [];
            jobId =  mapRes.jobId;
            clientId = mapRes.clientSocketId;
@@ -424,6 +422,7 @@
        } else /* Spawn instance */ {
            jobId =  execResults.jobId;
            clientId = execResults.clientSocketId;
+           execResults.sandboxId = socket.id;
            delete execResults.sandboxSocketId;
            delete execResults.data;
        }
